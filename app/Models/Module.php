@@ -4,16 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use OwenIt\Auditing\Auditable;
-use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class IncidentType extends Model implements AuditableContract
+class Module extends Model
 {
-    use Auditable, SoftDeletes;
+    use SoftDeletes;
 
-    /**
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'code',
@@ -21,13 +17,15 @@ class IncidentType extends Model implements AuditableContract
         'active',
     ];
 
-    /**
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'active' => 'boolean',
         ];
+    }
+
+    public function accesses(): HasMany
+    {
+        return $this->hasMany(Access::class);
     }
 }

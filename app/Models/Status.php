@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
-class Status extends Model
+class Status extends Model implements AuditableContract
 {
     use Auditable, SoftDeletes;
 
@@ -17,6 +18,7 @@ class Status extends Model
     protected $fillable = [
         'name',
         'code',
+        'color',
         'active',
     ];
 

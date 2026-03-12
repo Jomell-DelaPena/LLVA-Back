@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 
-class IncidentReport extends Model
+class IncidentReport extends Model implements AuditableContract
 {
     use Auditable, SoftDeletes;
 
