@@ -126,6 +126,46 @@ class AdminTimeSessionController extends Controller
         ]);
     }
 
+    /**
+     * GET /admin/time-sessions/export?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
+     * Full session list for Excel export — includes idle events, no pagination.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        $dateFrom = $request->input('date_from', now()->startOfMonth()->toDateString());
+        $dateTo   = $request->input('date_to',   now()->toDateString());
+
+        $sessions = TimeSession::with(['user', 'idleEvents'])
+            ->whereDate('started_at', '>=', $dateFrom)
+            ->whereDate('started_at', '<=', $dateTo)
+            ->orderBy('user_id')
+            ->orderBy('started_at')
+            ->get();
+
+        return response()->json($sessions->map(function ($s) {
+            $workSeconds = $s->ended_at
+                ? max(0, (int) $s->started_at->diffInSeconds($s->ended_at) - $s->total_idle_seconds)
+                : null;
+
+            return [
+                'user_id'            => $s->user_id,
+                'user_name'          => $s->user->name,
+                'date'               => $s->started_at->toDateString(),
+                'started_at'         => $s->started_at->toIso8601String(),
+                'ended_at'           => $s->ended_at?->toIso8601String(),
+                'total_idle_seconds' => $s->total_idle_seconds,
+                'work_seconds'       => $workSeconds,
+                'idle_events'        => $s->idleEvents
+                    ->sortBy('idle_start')
+                    ->values()
+                    ->map(fn ($e) => [
+                        'idle_start' => $e->idle_start,
+                        'idle_end'   => $e->idle_end,
+                    ]),
+            ];
+        }));
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private function formatSession(TimeSession $s): array
