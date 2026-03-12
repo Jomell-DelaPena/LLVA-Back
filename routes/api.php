@@ -51,8 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/presence-logs',  [PresenceLogController::class, 'index']);
     Route::post('/presence-logs', [PresenceLogController::class, 'store']);
 
-    // Admin — Time Tracker overview (order matters: /stats before /{timeSession})
+    // Admin — Time Tracker overview (order matters: /stats, /export before /{timeSession})
     Route::get('/admin/time-sessions/stats',          [AdminTimeSessionController::class, 'stats']);
+    Route::get('/admin/time-sessions/export',         [AdminTimeSessionController::class, 'export']);
     Route::get('/admin/time-sessions',                [AdminTimeSessionController::class, 'index']);
     Route::get('/admin/time-sessions/{timeSession}',  [AdminTimeSessionController::class, 'show']);
 
